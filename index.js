@@ -1,8 +1,15 @@
 const express = require('express');
 let persons = require('./persons');
+const morgan = require('morgan');
 const app = express();
 
+
 app.use(express.json());
+morgan.token('body', function (req, res) {
+    const body = req.body;
+    return JSON.stringify(body);
+});
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello, World!</h1>');
