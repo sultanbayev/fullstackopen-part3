@@ -19,22 +19,20 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello, World!</h1>');
 });
 
-app.get('/info', (request, response, next) => {
+app.get('/info', (request, response) => {
     Person
         .find({})
         .then(persons => {
             response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
         })
-        .catch(error => next(error))
 })
 
-app.get('/api/persons', (request, response, next) => {
+app.get('/api/persons', (request, response) => {
     Person
         .find({})
         .then(persons => {
             response.json(persons)
         })
-        .catch(error => next(error))
 });
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -124,7 +122,10 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
+
     next(error)
 }
 app.use(errorHandler);
