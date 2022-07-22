@@ -60,18 +60,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
-    if (!body.name) {
-        return response.status(400).json({ 
-            error: 'name is missing'
-        });
-    }
-
-    if (!body.number) {
-        return response.status(400).json({ 
-            error: 'number is missing'
-        });
-    }
-
     const person = new Person({
         name: body.name,
         number: body.number
@@ -87,28 +75,26 @@ app.post('/api/persons', (request, response, next) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
-
-    if (!body.name) {
-        return response.status(400).json({ 
-            error: 'name is missing'
-        });
-    }
-
-    if (!body.number) {
-        return response.status(400).json({ 
-            error: 'number is missing'
-        });
-    }
   
     const person = {
         name: body.name,
         number: body.number,
     }
 
+    const options = {
+        new: true,
+        runValidators: true,
+        context: 'query'
+    }
+
     Person
-        .findByIdAndUpdate(request.params.id, person, { new: true })
+        .findByIdAndUpdate(request.params.id, person, options)
         .then(updatedPerson => {
-            response.json(updatedPerson)
+            if (updatedPerson) {
+                response.json(updatedPerson)
+            } else {
+                response.status(404).end();
+            }
         })
         .catch(error => next(error))
 })
@@ -120,10 +106,13 @@ app.use(unknownEndpoint);
 
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
+
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
     } else if (error.name === 'ValidationError') {
         return response.status(400).json({ error: error.message })
+    } else if (error.name === 'MongoServerError' && error.code === 11000) {
+        return response.status(409).send({ error: 'name must be unique' })
     }
 
     next(error)
