@@ -1,10 +1,7 @@
 const logger = require('./logger');
 const morgan = require('morgan');
 
-morgan.token('body', function (req) {
-  const body = req.body;
-  return JSON.stringify(body);
-});
+morgan.token('body', (req) => JSON.stringify(req.body));
 const morganMiddleware = morgan(':method :url :status :res[content-length] - :response-time ms :body');
 
 const unknownEndpoint = (request, response) => {
