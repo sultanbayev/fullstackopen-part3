@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
+const logger = require('../utils/logger');
 
 const url = process.env.MONGODB_URI;
 
-console.log('connecting to MongoDB database');
+logger.info('connecting to MongoDB database');
 
 mongoose.connect(url)
   .then(() => {
-    console.log('Connected to database');
+    logger.info('Connected to database');
   })
   .catch((error) => {
-    console.log('Failed connect to database:', error.message);
+    logger.error('Failed connect to database:', error.message);
   });
 
 const personSchema = new mongoose.Schema({
