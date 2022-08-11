@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
+const config = require('../utils/config');
 
-const url = process.env.MONGODB_URI;
 
 logger.info('connecting to MongoDB database');
 
-mongoose.connect(url)
+mongoose.connect(config.MONGODB_URI)
   .then(() => {
     logger.info('Connected to database');
   })
