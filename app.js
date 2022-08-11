@@ -23,10 +23,6 @@ app.use(express.static('build'));
 app.use(express.json());
 app.use(middleware.morganMiddleware);
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello, World!</h1>');
-});
-
 app.get('/info', (request, response) => {
   Person
     .find({})
